@@ -1,3 +1,66 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
 body {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
     background: lightgray;
+}
+header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 10px;
+    color: white;
+}
+#dbConnect {
+    color: green;
+}
+main {
+    display: flex;
+}
+#formContainer {
+    flex: 1;
+    width: 100%;
+    background: lightblue;
+    padding: 20px;
+}
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+form > div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+#subBtnContainer {
+    justify-content: center;
+    padding-top: 20px;
+}
+#usersContainer {
+    flex: 3;
+    width: 100%;
+    background: lightgreen;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+}
+.row {
+    display: flex;
+}
+.cell {
+    flex: 1;
+    display: flex;
+    padding: 5px;
+}
+.header {
+    font-weight: bolder;
 }
