@@ -101,7 +101,7 @@ function displayUserList($userList)
             }
             $colCount++;
         }
-        echo "<div class='cell' id='actionContainer'>
+        echo "<div class='cell5' id='actionContainer'>
                 <form id='action' method='POST'>
                     <button id='update' type='submit' name='update' value='$id'>Update</button>
                     <button id='delete' type='submit' name='delete' value='$id'>Delete</button>
@@ -112,8 +112,8 @@ function displayUserList($userList)
             if ($id == $_POST["update"]) {
                 echo "<div class='updateRow'>";
                 echo "<form method='POST'>";
+                $colCount = 1;
                 foreach ($value as $key => $v) {
-                    $colCount = 1;
                     if($key == "id") {
                         echo "<div class='cell$colCount'></div>";
                     } else {
@@ -123,7 +123,7 @@ function displayUserList($userList)
                     }
                     $colCount++;
                 }
-                echo "<div class='cell'><button type='submit' name='confirm' value='$id'>Confirm</button></div>";
+                echo "<div class='cell5'><button id='confirm' type='submit' name='confirm' value='$id'>Confirm</button></div>";
                 echo "</form>";
                 echo "</div>";
             }

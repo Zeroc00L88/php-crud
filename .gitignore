@@ -1,4 +1,4 @@
-._DStore
+.DS_Store
 .ddev/
 test.html
 .php-cs-fixer.cache
