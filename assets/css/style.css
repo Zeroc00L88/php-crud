@@ -30,13 +30,14 @@ main {
     width: 100%;
     background: lightblue;
     padding: 20px;
+    height: 200px;
 }
-form {
+#formContainer > form {
     display: flex;
     flex-direction: column;
     gap: 10px;
 }
-form > div {
+#formContainer > form > div {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -53,14 +54,45 @@ form > div {
     flex-direction: column;
     padding: 10px;
 }
+.rowWrap {
+    border: 2px solid black;
+    margin: -1px;
+}
 .row {
     display: flex;
 }
-.cell {
+.updateRow {
+    display: flex;
+}
+.cell1 {
     flex: 1;
+    flex-wrap: wrap;
+    display: flex;
+    padding: 5px;
+}
+.cell2,
+.cell3,
+.cell4,
+.cell5 {
+    flex: 2;
+    flex-wrap: wrap;
     display: flex;
     padding: 5px;
 }
 .header {
     font-weight: bolder;
+}
+#update {
+    background: lightblue;
+}
+#delete {
+    background: lightcoral;
+}
+#action {
+    display: flex;
+    gap: 10px;
+}
+#actionContainer {
+    display: flex;
+    gap: 10px;
 }

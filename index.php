@@ -53,6 +53,21 @@ function readAllUsers($db)
     }
 }
 
+function updateUser($db, $id)
+{
+    $firstName = $_POST['FirstName'];
+    $familyName = $_POST['FamilyName'];
+    $email = $_POST['Email'];
+    try {
+        $sql = $db -> prepare(
+            "UPDATE user SET FirstName = '$firstName', FamilyName = '$familyName', Email = '$email' WHERE id = $id"
+        );
+        $sql -> execute();
+    } catch (PDOException $e) {
+        echo "Error : " . $e -> getMessage();
+    }
+}
+
 function deleteUser($db, $id)
 {
     try {
@@ -61,33 +76,58 @@ function deleteUser($db, $id)
         );
         $sql -> execute();
     } catch (PDOException $e) {
-        $db -> rollback();
         echo "Error : " . $e -> getMessage();
     }
 }
 
 function displayUserList($userList)
 {
-    $headerCols = count($userList[0]) + 1;
     echo "<div class='row header'>";
+    $colCount = 1;
     foreach ($userList[0] as $key => $value) {
-        echo "<div class='cell header'>$key</div>";
+        echo "<div class='cell$colCount header'>$key</div>";
+        $colCount++;
     }
-    echo "<div class='cell header'>Action</div>";
+    echo "<div class='cell5 header'>Action</div>";
     echo "</div>";
     foreach ($userList as $value) {
+        echo "<div class='rowWrap'>";
         echo "<div class='row'>";
+        $colCount = 1;
         foreach ($value as $key => $v) {
-            echo "<div class='cell'>$v</div>";
+            echo "<div class='cell$colCount'>$v</div>";
             if($key == "id") {
                 $id = $v;
             }
+            $colCount++;
         }
-        echo "<div class='cell'>
-                <form method='POST'>
-                    <button type='submit' name='delete' value='$id'>Delete</button>
+        echo "<div class='cell' id='actionContainer'>
+                <form id='action' method='POST'>
+                    <button id='update' type='submit' name='update' value='$id'>Update</button>
+                    <button id='delete' type='submit' name='delete' value='$id'>Delete</button>
                 <form>
             </div>";
+        echo "</div>";
+        if(isset($_POST["update"])) {
+            if ($id == $_POST["update"]) {
+                echo "<div class='updateRow'>";
+                echo "<form method='POST'>";
+                foreach ($value as $key => $v) {
+                    $colCount = 1;
+                    if($key == "id") {
+                        echo "<div class='cell$colCount'></div>";
+                    } else {
+                        echo "<div class='cell$colCount'>
+                        <input type='text' name=$key value=$v>
+                        </div>";
+                    }
+                    $colCount++;
+                }
+                echo "<div class='cell'><button type='submit' name='confirm' value='$id'>Confirm</button></div>";
+                echo "</form>";
+                echo "</div>";
+            }
+        }
         echo "</div>";
     }
 }
@@ -127,7 +167,7 @@ if (isset($_POST["subBtn"])) {
                     </div>
                     <div>
                         <label for="mail">Email</label>
-                        <input id="mail" type="text" name="mail" value="">
+                        <input id="mail" type="email" name="mail" value="">
                     </div>
                     <div id="subBtnContainer">
                         <input id="subBtn" type="submit" name="subBtn" value="Create User">
@@ -137,12 +177,15 @@ if (isset($_POST["subBtn"])) {
             <div id="usersContainer">
 <?php
 
-$AllUsers = readAllUsers($db);
-displayUserList($AllUsers);
 if (isset($_POST["delete"])) {
     deleteUser($db, $_POST["delete"]);
     header("refresh:0");
 }
+if (isset($_POST["confirm"])) {
+    updateUser($db, $_POST['confirm']);
+    header("refresh:0");
+}
+displayUserList(readAllUsers($db));
 
 ?>
 
