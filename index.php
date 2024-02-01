@@ -3,6 +3,9 @@ $servername = 'db:3306';
 $username = 'db';
 $password = 'db';
 
+$mailRegex = '/^[a-zA-Z0-9_\.\-]+@[a-zA-Z0-9_\.\-]+\.[a-zA-Z0-9_\.\-]{2,255}/';
+$nameRegex = '/^[a-zA-Zà-üÀ-Ü\-]{1,30}/';
+
 function dbConnect($connect, $servername, $username, $password)
 {
     if($connect) {
@@ -21,63 +24,71 @@ function dbConnect($connect, $servername, $username, $password)
     }
 }
 
-function createUser($db, $firstName, $familyName, $eMail)
+function createUser($db, $firstName, $familyName, $eMail, $mailRegex, $nameRegex)
 {
-    try {
-        $sql = $db -> prepare(
-            "INSERT INTO user(FirstName, FamilyName, Email)
+    $sql = $db -> prepare(
+        "INSERT INTO user(FirstName, FamilyName, Email)
             VALUES (:FirstName, :FamilyName, :Email)"
-        );
-        $sql -> bindParam(':FirstName', $firstName);
-        $sql -> bindParam(':FamilyName', $familyName);
-        $sql -> bindParam(':Email', $eMail);
+    );
+    $sql -> bindParam(':FirstName', $firstName);
+    $sql -> bindParam(':FamilyName', $familyName);
+    $sql -> bindParam(':Email', $eMail);
 
-        $sql -> execute();
-    } catch (PDOException $e) {
-        $db -> rollback();
-        echo "Error : " . $e -> getMessage();
+    if(!preg_match($mailRegex, $eMail)) {
+        throw new Exception("Error Wrong Syntax on Email");
     }
+
+    if(!preg_match($nameRegex, $firstName)) {
+        throw new Exception("Error Wrong FirstName Syntax");
+    }
+
+    if(!preg_match($nameRegex, $familyName)) {
+        throw new Exception("Error Wrong FamilyName Syntax");
+    }
+
+    $sql -> execute();
 }
 
 function readAllUsers($db)
 {
-    try {
-        $sql = $db -> prepare(
-            "SELECT * FROM user"
-        );
-        $sql -> execute();
-        $res = $sql -> fetchAll(PDO::FETCH_ASSOC);
-        return $res;
-    } catch (PDOException $e) {
-        echo "Error : " . $e -> getMessage();
-    }
+    $sql = $db -> prepare(
+        "SELECT * FROM user"
+    );
+    $sql -> execute();
+    $res = $sql -> fetchAll(PDO::FETCH_ASSOC);
+    return $res;
 }
 
-function updateUser($db, $id)
+function updateUser($db, $id, $mailRegex, $nameRegex)
 {
     $firstName = $_POST['FirstName'];
     $familyName = $_POST['FamilyName'];
-    $email = $_POST['Email'];
-    try {
-        $sql = $db -> prepare(
-            "UPDATE user SET FirstName = '$firstName', FamilyName = '$familyName', Email = '$email' WHERE id = $id"
-        );
-        $sql -> execute();
-    } catch (PDOException $e) {
-        echo "Error : " . $e -> getMessage();
+    $eMail = $_POST['Email'];
+    $sql = $db -> prepare(
+        "UPDATE user SET FirstName = '$firstName', FamilyName = '$familyName', Email = '$eMail' WHERE id = $id"
+    );
+
+    if(!preg_match($mailRegex, $eMail)) {
+        throw new Exception("Error Wrong Syntax on Email");
     }
+
+    if(!preg_match($nameRegex, $firstName)) {
+        throw new Exception("Error Wrong FirstName Syntax");
+    }
+
+    if(!preg_match($nameRegex, $familyName)) {
+        throw new Exception("Error Wrong FamilyName Syntax");
+    }
+
+    $sql -> execute();
 }
 
 function deleteUser($db, $id)
 {
-    try {
-        $sql = $db -> prepare(
-            "DELETE FROM user WHERE id = $id"
-        );
-        $sql -> execute();
-    } catch (PDOException $e) {
-        echo "Error : " . $e -> getMessage();
-    }
+    $sql = $db -> prepare(
+        "DELETE FROM user WHERE id = $id"
+    );
+    $sql -> execute();
 }
 
 function displayUserList($userList)
@@ -149,9 +160,6 @@ function displayUserList($userList)
 <?php
 echo "<p>DB State : </p>";
 $db = dbConnect(true, $servername, $username, $password);
-if (isset($_POST["subBtn"])) {
-    createUser($db, $_POST["firstName"], $_POST["name"], $_POST["mail"]);
-}
 ?>
         </header>
         <main>
@@ -177,21 +185,51 @@ if (isset($_POST["subBtn"])) {
             <div id="usersContainer">
 <?php
 
-if (isset($_POST["delete"])) {
-    deleteUser($db, $_POST["delete"]);
-    header("refresh:0");
-}
-if (isset($_POST["confirm"])) {
-    updateUser($db, $_POST['confirm']);
-    header("refresh:0");
-}
-$allUsers = readAllUsers($db);
-if ($allUsers == []) {
-    echo "<p>No data to display, please create users.</p>";
-} else {
-    displayUserList($allUsers);
+try {
+
+    $db -> beginTransaction();
+
+    // User Create
+    if (isset($_POST["subBtn"])) {
+        createUser($db, $_POST["firstName"], $_POST["name"], $_POST["mail"], $mailRegex, $nameRegex);
+        header("refresh:0");
+    }
+    // User Delete
+    if (isset($_POST["delete"])) {
+        deleteUser($db, $_POST["delete"]);
+        header("refresh:0");
+    }
+    // User Update
+    if (isset($_POST["confirm"])) {
+        updateUser($db, $_POST['confirm'], $mailRegex, $nameRegex);
+        header("refresh:0");
+    }
+
+    $db -> commit();
+
+} catch (Exception | PDOException $e) {
+    $db -> rollback();
+    echo $e -> getMessage();
 }
 
+try {
+
+    $db -> beginTransaction();
+
+    // Users Read
+    $allUsers = readAllUsers($db);
+    if ($allUsers == []) {
+        echo "<p>No data to display, please create users.</p>";
+    } else {
+        displayUserList($allUsers);
+    }
+
+    $db -> commit();
+
+} catch (Exception | PDOException $e) {
+    $db -> rollback();
+    echo $e -> getMessage();
+}
 ?>
 
             </div>

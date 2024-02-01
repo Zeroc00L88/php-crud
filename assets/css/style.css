@@ -34,6 +34,7 @@ main {
     background: rgba(0, 0, 0, 0.7);
     padding: 20px;
     border-radius: 20px;
+    font-size: 20px;
 }
 #formContainer > form {
     display: flex;
@@ -116,6 +117,7 @@ main {
 }
 input {
     padding: 5px;
+    font-size: 20px;
 }
 button {
     cursor: pointer;
