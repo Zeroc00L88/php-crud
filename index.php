@@ -170,7 +170,7 @@ if (isset($_POST["subBtn"])) {
                         <input id="mail" type="email" name="mail" value="">
                     </div>
                     <div id="subBtnContainer">
-                        <input id="subBtn" type="submit" name="subBtn" value="Create User">
+                        <button id="subBtn" type="submit" name="subBtn" value="Create User">Create User</button>
                     </div>
                 </form>
             </div>
@@ -185,7 +185,12 @@ if (isset($_POST["confirm"])) {
     updateUser($db, $_POST['confirm']);
     header("refresh:0");
 }
-displayUserList(readAllUsers($db));
+$allUsers = readAllUsers($db);
+if ($allUsers == []) {
+    echo "<p>No data to display, please create users.</p>";
+} else {
+    displayUserList($allUsers);
+}
 
 ?>
 

@@ -38,18 +38,22 @@ main {
 #formContainer > form {
     display: flex;
     gap: 10px;
-    align-items: center;
+    align-items: last baseline;
     justify-content: center;
 }
 #formContainer > form > div {
     display: flex;
-    align-items: center;
+    flex-direction: column;
     justify-content: center;
+    align-items: center;
     gap: 10px;
     justify-content: space-between;
 }
 #subBtnContainer {
-    justify-content: center;
+    display: flex;
+}
+#subBtnContainer button {
+    background: lightgreen;
 }
 #usersContainer {
     background: rgba(0, 0, 0, 0.8);
@@ -111,5 +115,9 @@ main {
     gap: 10px;
 }
 input {
+    padding: 5px;
+}
+button {
+    cursor: pointer;
     padding: 5px;
 }

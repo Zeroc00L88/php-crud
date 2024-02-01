@@ -2,3 +2,4 @@
 .ddev/
 test.html
 .php-cs-fixer.cache
+sample.sql
